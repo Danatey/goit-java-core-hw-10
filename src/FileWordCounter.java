@@ -1,32 +1,35 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FileWordCounter {
 
     public static void countWords(String fileName) {
-        try {
-            String text = new String(Files.readAllBytes(Paths.get(fileName)));
+        Map<String, Integer> hashMap = new HashMap<>();
 
-            String[] words = text.split("\\s+");
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
 
-            Map<String, Integer> frequency = new HashMap<>();
-            for (String word : words) {
-                if (!word.isEmpty()) {
-                    frequency.put(word, frequency.getOrDefault(word, 0) + 1);
+            String line;
+            while ((line = reader.readLine()) != null) {
+
+                String[] words = line.trim().split("\\s+");
+
+                for (String word : words) {
+                    if (!word.isEmpty()) {
+                        hashMap.put(word, hashMap.getOrDefault(word, 0) + 1);
+                    }
                 }
             }
 
             List<Map.Entry<String, Integer>> sorted =
-                    frequency.entrySet()
+                    hashMap.entrySet()
                             .stream()
                             .sorted((a, b) -> b.getValue() - a.getValue())
-                            .collect(Collectors.toList());
+                            .toList();
 
             for (Map.Entry<String, Integer> entry : sorted) {
-                System.out.println(entry.getKey() + " " + entry.getValue());
+                System.out.println(entry.getKey() + " = " + entry.getValue());
             }
 
         } catch (IOException e) {
